@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"proyecto1-web-bck/db"
 	customMiddleware "proyecto1-web-bck/middleware"
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
+
+	"proyecto1-web-bck/db"
+	"proyecto1-web-bck/handlers"
 )
 
 func main() {
@@ -25,6 +27,14 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	})
+
+	// series related routes
+	r.Get("/series", handlers.GetSeries)
+	r.Get("/series/{id}", handlers.GetSeriesByID)
+
+	r.Post("/series", handlers.CreateSeries)
+	r.Put("/series/{id}", handlers.UpdateSeries)
+	r.Delete("/series/{id}", handlers.DeleteSeries)
 
 	fmt.Println("Server running on :8080")
 	http.ListenAndServe(":8080", r)
