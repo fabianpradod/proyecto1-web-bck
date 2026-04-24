@@ -6,7 +6,8 @@ Construida en Go con PostgreSQL.
 
 ## Repositorios
 
-- **Frontend:** https://github.com/fabianpradod/proyecto1-web-frt
+- **Frontend git:** https://github.com/fabianpradod/proyecto1-web-frt
+- **Frontend link:** https://fabianpradod.github.io/proyecto1-web-frt/
 
 ## Tech Stack
 
