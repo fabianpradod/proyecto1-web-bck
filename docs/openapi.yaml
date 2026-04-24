@@ -1,5 +1,265 @@
 openapi: "3.0.0"
 info:
-  title: proyecto1-web-bck API
+  title: Series Tracker API
   version: "1.0.0"
-paths: {}
+  description: REST API for TV series and ratings
+
+servers:
+  - url: http://localhost:8080
+    description: Local
+
+paths:
+  /series:
+    get:
+      summary: List all series
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Search by name
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [id, name, genre, episodes, created_at]
+          description: Sort field
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort order
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Page number
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: Results per page
+      responses:
+        "200":
+          description: List of series
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Series"
+    post:
+      summary: Create a new series
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeriesInput"
+      responses:
+        "201":
+          description: Created series
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Series"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /series/{id}:
+    get:
+      summary: Get a series by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Series found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Series"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Update a series
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeriesInput"
+      responses:
+        "200":
+          description: Updated series
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Series"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a series
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted successfully
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /series/{id}/rating:
+    get:
+      summary: Get average rating for a series
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rating summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RatingSummary"
+    post:
+      summary: Add a rating for a series
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RatingInput"
+      responses:
+        "201":
+          description: Rating created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rating"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Series:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        genre:
+          type: string
+        status:
+          type: string
+        episodes:
+          type: integer
+        image_url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    SeriesInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        genre:
+          type: string
+        status:
+          type: string
+        episodes:
+          type: integer
+        image_url:
+          type: string
+
+    Rating:
+      type: object
+      properties:
+        id:
+          type: integer
+        series_id:
+          type: integer
+        score:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    RatingInput:
+      type: object
+      required:
+        - score
+      properties:
+        score:
+          type: integer
+          minimum: 1
+          maximum: 10
+
+    RatingSummary:
+      type: object
+      properties:
+        series_id:
+          type: integer
+        average:
+          type: number
+        count:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
